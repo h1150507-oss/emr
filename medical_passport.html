@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Medical Passport｜多國語言隨身電子病歷</title>
+<style>
+:root{
+  --navy:#164e73; --blue:#287fb3; --sky:#eaf7ff; --ice:#f6fbfe;
+  --line:#cfe5f1; --text:#193447; --muted:#668091; --white:#fff;
+  --danger:#a33a45; --shadow:0 12px 35px rgba(28,83,112,.10);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,"Noto Sans TC","Noto Sans JP","Noto Sans KR",Arial,sans-serif;
+color:var(--text);background:linear-gradient(145deg,#f7fcff 0%,#eaf7ff 55%,#fafdff 100%);line-height:1.6}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);
+border-bottom:1px solid var(--line);padding:12px 4vw;display:flex;gap:16px;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:12px;align-items:center;font-weight:800;color:var(--navy)}
+.logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#8bd2f5,#287fb3);
+display:grid;place-items:center;color:white;font-size:22px;box-shadow:0 7px 18px #287fb333}
+.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select,.btn{border:1px solid var(--line);background:white;border-radius:10px;padding:9px 12px;color:var(--text)}
+.btn.primary{background:var(--blue);color:white;border-color:var(--blue)}
+.btn.soft{background:var(--sky)}
+.btn.danger{color:var(--danger)}
+.hero{max-width:1200px;margin:36px auto 22px;padding:0 22px}
+.hero h1{font-size:clamp(30px,5vw,52px);line-height:1.1;margin:0 0 12px;color:var(--navy)}
+.hero p{max-width:760px;color:var(--muted);margin:0}
+.notice{margin-top:18px;background:#fff;border:1px solid var(--line);border-left:5px solid #56a8d4;
+padding:13px 16px;border-radius:12px;box-shadow:var(--shadow);font-size:14px}
+.layout{max-width:1200px;margin:auto;padding:0 22px 55px;display:grid;grid-template-columns:245px 1fr;gap:22px}
+nav{position:sticky;top:84px;height:max-content;background:rgba(255,255,255,.82);border:1px solid var(--line);
+border-radius:18px;padding:10px;box-shadow:var(--shadow)}
+nav button{width:100%;text-align:left;border:0;background:transparent;padding:11px 13px;border-radius:10px;color:#496879}
+nav button.active,nav button:hover{background:var(--sky);color:var(--navy);font-weight:700}
+main{min-width:0}.card{background:rgba(255,255,255,.93);border:1px solid var(--line);border-radius:18px;
+padding:22px;box-shadow:var(--shadow);margin-bottom:18px}
+.card h2{margin:0 0 5px;color:var(--navy);font-size:22px}.sub{margin:0 0 18px;color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}
+label{font-size:13px;font-weight:700;color:#456778}
+input,textarea{width:100%;border:1px solid var(--line);background:#fbfeff;border-radius:10px;padding:10px 11px;
+outline:none;color:var(--text)}input:focus,textarea:focus{border-color:#62add4;box-shadow:0 0 0 3px #62add422}
+textarea{min-height:95px;resize:vertical}
+.tagrow{display:flex;gap:8px;flex-wrap:wrap}.tag{background:var(--sky);border:1px solid var(--line);padding:5px 9px;border-radius:999px;font-size:12px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.section{display:none}.section.active{display:block}
+.timeline{display:grid;gap:10px}.entry{border:1px solid var(--line);border-radius:12px;padding:13px;background:#fbfeff}
+.entry strong{color:var(--navy)}
+.footer{text-align:center;color:var(--muted);font-size:12px;padding:15px}
+.toast{position:fixed;right:20px;bottom:20px;background:var(--navy);color:#fff;padding:12px 16px;border-radius:10px;
+opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none}.toast.show{opacity:1;transform:none}
+@media(max-width:800px){.layout{grid-template-columns:1fr}nav{position:static;display:flex;overflow:auto;gap:5px}nav button{white-space:nowrap;width:auto}.grid{grid-template-columns:1fr}}
+@media print{.topbar,nav,.actions,.notice{display:none}.hero{margin-top:0}.layout{display:block}.card{box-shadow:none;break-inside:avoid}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><div class="logo">✚</div><div>My Medical Passport<br><small>Personal Health Record</small></div></div>
+  <div class="actions">
+    <select id="language" aria-label="Language">
+      <option value="zh-TW">繁體中文</option><option value="en">English</option>
+      <option value="ko">한국어</option><option value="ja">日本語</option><option value="vi">Tiếng Việt</option>
+    </select>
+    <button class="btn soft" onclick="window.print()">🖨 列印 / PDF</button>
+    <button class="btn primary" onclick="saveRecord()">💾 儲存</button>
+  </div>
+</header>
+
+<section class="hero">
+  <h1 data-i18n="title">我的隨身電子病歷</h1>
+  <p data-i18n="subtitle">一份可攜式、清楚、跨國使用的個人健康資料護照。</p>
+  <div class="notice">🔒 <b>隱私提醒：</b>這是純前端靜態範本。資料只保存在本機瀏覽器（localStorage），沒有上傳伺服器。若放入真實醫療資料，請另外評估加密、裝置安全、備份與法規需求。</div>
+</section>
+
+<div class="layout">
+<nav id="nav">
+  <button class="active" data-target="basic">👤 個人資料</button>
+  <button data-target="history">🩺 病史</button>
+  <button data-target="surgery">🏥 手術／住院</button>
+  <button data-target="meds">💊 用藥</button>
+  <button data-target="allergy">⚠️ 過敏／疫苗</button>
+  <button data-target="family">🧬 家族史</button>
+  <button data-target="lifestyle">🌿 生活史</button>
+  <button data-target="records">📎 檢查／醫療紀錄</button>
+  <button data-target="emergency">🚨 緊急資訊</button>
+</nav>
+
+<main>
+<section id="basic" class="section active">
+<div class="card"><h2>👤 個人資料</h2><p class="sub">建議填寫醫療人員最常需要確認的身分與聯絡資訊。</p>
+<div class="grid">
+<div class="field"><label>姓名 / Full Name</label><input name="name"></div>
+<div class="field"><label>出生日期 / Date of Birth</label><input name="dob" type="date"></div>
+<div class="field"><label>性別 / Sex（依需要填寫）</label><input name="sex"></div>
+<div class="field"><label>血型 / Blood Type</label><input name="blood"></div>
+<div class="field"><label>國籍 / Nationality</label><input name="nationality"></div>
+<div class="field"><label>常用語言 / Languages</label><input name="languages" placeholder="中文、English、한국어…"></div>
+<div class="field"><label>電話 / Phone</label><input name="phone"></div>
+<div class="field"><label>Email</label><input name="email" type="email"></div>
+<div class="field full"><label>醫療備註 / Important Medical Notes</label><textarea name="medicalNotes"></textarea></div>
+</div></div></section>
+
+<section id="history" class="section"><div class="card"><h2>🩺 疾病史</h2><p class="sub">包含目前疾病、過去疾病、慢性病與重要診斷。</p>
+<div class="grid">
+<div class="field full"><label>目前疾病／診斷 / Current Diagnoses</label><textarea name="currentDx"></textarea></div>
+<div class="field full"><label>過去疾病史 / Past Medical History</label><textarea name="pastDx"></textarea></div>
+<div class="field"><label>慢性病 / Chronic Conditions</label><textarea name="chronic"></textarea></div>
+<div class="field"><label>感染／重大疾病 / Significant Infections</label><textarea name="infections"></textarea></div>
+<div class="field full"><label>器官／功能相關病史、其他重要病史</label><textarea name="otherHistory"></textarea></div>
+</div></div></section>
+
+<section id="surgery" class="section"><div class="card"><h2>🏥 手術／住院史</h2><p class="sub">可記錄日期、手術名稱、醫院與重要結果。</p>
+<div class="grid">
+<div class="field"><label>手術名稱 / Procedure</label><input name="surgeryName"></div>
+<div class="field"><label>日期 / Date</label><input name="surgeryDate" type="date"></div>
+<div class="field"><label>醫院 / Hospital</label><input name="hospital"></div>
+<div class="field"><label>麻醉方式 / Anesthesia</label><input name="anesthesia"></div>
+<div class="field full"><label>結果／併發症／住院摘要</label><textarea name="surgeryNotes"></textarea></div>
+</div></div></section>
+
+<section id="meds" class="section"><div class="card"><h2>💊 用藥史</h2><p class="sub">除了處方藥，也建議記錄非處方藥、保健品與停藥原因。</p>
+<div class="grid">
+<div class="field"><label>藥品名稱 / Medication</label><input name="medName"></div>
+<div class="field"><label>劑量與頻率 / Dose & Frequency</label><input name="medDose"></div>
+<div class="field"><label>開始／停止日期</label><input name="medPeriod"></div>
+<div class="field"><label>開立醫師／來源</label><input name="prescriber"></div>
+<div class="field full"><label>用藥原因、效果、副作用或停藥原因</label><textarea name="medNotes"></textarea></div>
+<div class="field full"><label>其他藥物、OTC、草藥、保健品</label><textarea name="supplements"></textarea></div>
+</div></div></section>
+
+<section id="allergy" class="section"><div class="card"><h2>⚠️ 過敏／疫苗</h2>
+<div class="grid">
+<div class="field full"><label>藥物過敏 / Drug Allergies</label><textarea name="drugAllergy"></textarea></div>
+<div class="field"><label>食物／其他過敏</label><textarea name="otherAllergy"></textarea></div>
+<div class="field"><label>過敏反應類型／嚴重度</label><textarea name="allergyReaction"></textarea></div>
+<div class="field full"><label>疫苗紀錄／重要預防接種</label><textarea name="vaccines"></textarea></div>
+</div></div></section>
+
+<section id="family" class="section"><div class="card"><h2>🧬 家族史</h2><p class="sub">可依親屬與疾病記錄；不確定的資料請標示「不詳」。</p>
+<div class="grid">
+<div class="field full"><label>父系家族史 / Paternal Family History</label><textarea name="paternal"></textarea></div>
+<div class="field full"><label>母系家族史 / Maternal Family History</label><textarea name="maternal"></textarea></div>
+<div class="field full"><label>遺傳疾病／癌症／心血管疾病／代謝疾病等</label><textarea name="genetic"></textarea></div>
+</div></div></section>
+
+<section id="lifestyle" class="section"><div class="card"><h2>🌿 生活史</h2>
+<div class="grid">
+<div class="field"><label>吸菸史 / Tobacco</label><textarea name="smoking"></textarea></div>
+<div class="field"><label>飲酒／其他物質使用</label><textarea name="alcohol"></textarea></div>
+<div class="field"><label>飲食型態 / Diet</label><textarea name="diet"></textarea></div>
+<div class="field"><label>運動 / Exercise</label><textarea name="exercise"></textarea></div>
+<div class="field"><label>職業／工作暴露</label><textarea name="occupation"></textarea></div>
+<div class="field"><label>旅遊／居住史（醫療相關時）</label><textarea name="travel"></textarea></div>
+</div></div></section>
+
+<section id="records" class="section"><div class="card"><h2>📎 檢查／醫療紀錄</h2>
+<div class="grid">
+<div class="field"><label>最近重要檢查日期</label><input name="testDate" type="date"></div>
+<div class="field"><label>檢查名稱／結果摘要</label><input name="testName"></div>
+<div class="field full"><label>影像、檢驗、病理、心電圖等重要結果</label><textarea name="tests"></textarea></div>
+<div class="field full"><label>醫師／醫院／病例號（注意隱私）</label><textarea name="providers"></textarea></div>
+</div></div></section>
+
+<section id="emergency" class="section"><div class="card"><h2>🚨 緊急資訊</h2>
+<div class="grid">
+<div class="field"><label>緊急聯絡人 / Emergency Contact</label><input name="emergencyName"></div>
+<div class="field"><label>關係 / Relationship</label><input name="emergencyRelation"></div>
+<div class="field"><label>電話 / Phone</label><input name="emergencyPhone"></div>
+<div class="field"><label>第二緊急聯絡人</label><input name="emergency2"></div>
+<div class="field full"><label>緊急醫療重點（例如重大過敏、重要用藥、特殊醫療需求）</label><textarea name="emergencyNotes"></textarea></div>
+<div class="field full"><label>醫療代理／預立醫療照護相關資訊（如適用）</label><textarea name="advanceCare"></textarea></div>
+</div></div></section>
+
+<div class="card"><div class="row">
+<button class="btn primary" onclick="saveRecord()">💾 儲存到本機</button>
+<button class="btn soft" onclick="loadRecord()">↻ 載入已儲存資料</button>
+<button class="btn danger" onclick="clearRecord()">清除本機資料</button>
+</div></div>
+</main></div>
+<div class="footer">My Medical Passport · Static HTML/CSS/JavaScript · 本範本不取代正式醫療紀錄系統</div>
+<div id="toast" class="toast">已儲存</div>
+
+<script>
+const translations={
+"zh-TW":{title:"我的隨身電子病歷",subtitle:"一份可攜式、清楚、跨國使用的個人健康資料護照。"},
+en:{title:"My Portable Medical Record",subtitle:"A clear, portable personal health passport for use across countries."},
+ko:{title:"나의 휴대용 전자 의료 기록",subtitle:"여러 나라에서 사용할 수 있는 휴대용 개인 건강 기록입니다."},
+ja:{title:"私の携帯用電子カルテ",subtitle:"海外でも使いやすい、携帯型パーソナル健康記録です。"},
+vi:{title:"Hồ sơ y tế cá nhân",subtitle:"Hộ chiếu sức khỏe cá nhân rõ ràng, tiện mang theo và sử dụng quốc tế."}
+};
+const fields=[...document.querySelectorAll("input,textarea")];
+function toast(t="已儲存"){const el=document.getElementById("toast");el.textContent=t;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),1600)}
+function saveRecord(){const data={};fields.forEach(x=>data[x.name]=x.value);localStorage.setItem("medicalPassport",JSON.stringify(data));toast("資料已儲存於此瀏覽器");}
+function loadRecord(){const data=JSON.parse(localStorage.getItem("medicalPassport")||"{}");fields.forEach(x=>{if(data[x.name]!==undefined)x.value=data[x.name]});toast("已載入本機資料");}
+function clearRecord(){if(confirm("確定清除這個瀏覽器儲存的病歷資料嗎？")){localStorage.removeItem("medicalPassport");fields.forEach(x=>x.value="");toast("本機資料已清除")}}
+document.querySelectorAll("#nav button").forEach(btn=>btn.addEventListener("click",()=>{
+ document.querySelectorAll("#nav button").forEach(b=>b.classList.remove("active"));btn.classList.add("active");
+ document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+ document.getElementById(btn.dataset.target).classList.add("active");
+ window.scrollTo({top:180,behavior:"smooth"});
+}));
+document.getElementById("language").addEventListener("change",e=>{
+ const t=translations[e.target.value]||translations["zh-TW"];
+ document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t[el.dataset.i18n]);
+ document.documentElement.lang=e.target.value;
+});
+loadRecord();
+</script>
+</body>
+</html>
